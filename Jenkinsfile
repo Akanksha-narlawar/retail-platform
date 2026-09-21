@@ -202,7 +202,7 @@ pipeline {
 
                     echo "Waiting 15 seconds for application to become ready..."
 
-                    bat "timeout /t 15 /nobreak"
+                    bat "ping 127.0.0.1 -n 16 > nul"
 
                     echo "Checking application health..."
 
