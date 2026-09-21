@@ -88,10 +88,41 @@ pipeline {
                 echo "Building Docker image: retail-app:${params.VERSION}"
 
                 bat """
-                "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t retail-app:${params.VERSION} .
+                    "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t retail-app:${params.VERSION} .
                 """
 
                 echo "Docker image retail-app:${params.VERSION} built successfully"
+            }
+        }
+
+        stage('Record Previous Production Image') {
+            steps {
+                script {
+                    def dockerPath = "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
+
+                    def containerExists = bat(
+                        script: "\"${dockerPath}\" ps -a --filter \"name=retail-app-4.2.1\" --format \"{{.Names}}\"",
+                        returnStdout: true
+                    ).trim()
+
+                    if (containerExists == "retail-app-4.2.1") {
+
+                        def previousImage = bat(
+                            script: "\"${dockerPath}\" inspect --format=\"{{.Config.Image}}\" retail-app-4.2.1",
+                            returnStdout: true
+                        ).trim()
+
+                        echo "Previous production container: retail-app-4.2.1"
+                        echo "Previous production image: ${previousImage}"
+
+                        env.PREVIOUS_PRODUCTION_IMAGE = previousImage
+
+                    } else {
+
+                        echo "No previous production container found"
+                        env.PREVIOUS_PRODUCTION_IMAGE = "NONE"
+                    }
+                }
             }
         }
 
