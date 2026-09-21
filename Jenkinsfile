@@ -88,7 +88,7 @@ pipeline {
                 echo "Building Docker image: retail-app:${params.VERSION}"
 
                 bat """
-                    docker build -t retail-app:${params.VERSION} .
+                "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t retail-app:${params.VERSION} .
                 """
 
                 echo "Docker image retail-app:${params.VERSION} built successfully"
