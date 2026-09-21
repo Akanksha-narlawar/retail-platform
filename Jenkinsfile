@@ -112,7 +112,7 @@ pipeline {
                         returnStdout: true
                     ).trim()
 
-                    if (containerExists == "retail-app-4.2.1") {
+                    if (containerExists.contains("retail-app-4.2.1")) {
 
                         def previousImage = bat(
                             script: "\"${dockerPath}\" inspect --format=\"{{.Config.Image}}\" retail-app-4.2.1",
