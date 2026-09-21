@@ -45,5 +45,32 @@ pipeline {
             }
         }
 
+        stage('Validate Git Version') {
+            steps {
+                script {
+                    def tag = "v${params.VERSION}"
+
+                    echo "Checking Git tag: ${tag}"
+
+                    def tagExists = bat(
+                        script: "git tag --list ${tag}",
+                        returnStdout: true
+                    ).trim()
+
+                    if (tagExists != tag) {
+                        error("Git tag ${tag} does not exist")
+                    }
+
+                    echo "Git tag ${tag} exists"
+
+                    def commitId = bat(
+                        script: "git rev-list -n 1 ${tag}",
+                        returnStdout: true
+                    ).trim()
+
+                    echo "Selected Git commit: ${commitId}"
+                }
+            }
+        }
     }
 }
