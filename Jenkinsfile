@@ -98,7 +98,14 @@ pipeline {
         stage('Record Previous Production Image') {
             steps {
                 script {
+
                     def dockerPath = "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
+
+                    echo "Docker containers visible to Jenkins:"
+
+                    bat """
+                        "${dockerPath}" ps -a
+                    """
 
                     def containerExists = bat(
                         script: "\"${dockerPath}\" ps -a --filter \"name=retail-app-4.2.1\" --format \"{{.Names}}\"",
