@@ -12,7 +12,7 @@ def home():
         "application": "Retail Platform",
         "version": VERSION,
         "environment": ENVIRONMENT,
-        "payment_status": "Payment processing available"
+        "payment_status": "Payment processing fixed"
     })
 
 @app.route("/health")
