@@ -63,11 +63,11 @@ pipeline {
                     echo "Checking Git tag: ${tag}"
 
                     def tagExists = bat(
-                        script: "git tag --list ${tag}",
-                        returnStdout: true
-                    ).trim()
+                        script: "git rev-parse --verify refs/tags/${tag}",
+                        returnStatus: true
+                    )
 
-                    if (tagExists != tag) {
+                    if (tagExists != 0) {
                         error("Git tag ${tag} does not exist")
                     }
 
