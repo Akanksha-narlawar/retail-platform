@@ -11,6 +11,7 @@ def home():
     return jsonify({
         "application": "Retail Platform",
         "version": VERSION,
+        "release": "4.2.2-failure-test",
         "environment": ENVIRONMENT,
         "payment_status": "Payment processing fixed"
     })
