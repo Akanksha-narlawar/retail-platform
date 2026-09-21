@@ -141,5 +141,79 @@ pipeline {
             }
         }
 
+        stage('Deploy New Version Container') {
+            steps {
+                script {
+
+                    def dockerPath = "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
+
+                    echo "======================================"
+                    echo "Preparing Docker network"
+                    echo "======================================"
+
+                    bat """
+                        "${dockerPath}" network inspect retail-network >nul 2>&1 || "${dockerPath}" network create retail-network
+                    """
+
+                    echo "Docker network retail-network is ready"
+
+                    echo "======================================"
+                    echo "Starting new version container"
+                    echo "======================================"
+
+                    bat """
+                        "${dockerPath}" rm -f retail-app-candidate 2>nul || exit /b 0
+                    """
+
+                    bat """
+                        "${dockerPath}" run -d ^
+                        --name retail-app-candidate ^
+                        --network retail-network ^
+                        -p 18081:5000 ^
+                        -e APP_VERSION=${params.VERSION} ^
+                        -e ENVIRONMENT=${params.ENVIRONMENT} ^
+                        retail-app:${params.VERSION}
+                    """
+
+                    echo "New version container started successfully"
+
+                    echo "Candidate container status:"
+
+                    bat """
+                        "${dockerPath}" ps -a --filter "name=retail-app-candidate"
+                    """
+                }
+            }
+        }
+
+        stage('Health Check New Version') {
+            steps {
+                script {
+
+                    def dockerPath = "C:\\Users\\akank\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe"
+
+                    echo "======================================"
+                    echo "Waiting for new container health check"
+                    echo "======================================"
+
+                    bat """
+                        "${dockerPath}" inspect --format="{{.State.Health.Status}}" retail-app-candidate
+                    """
+
+                    echo "Checking application health..."
+
+                    bat """
+                        powershell -Command ^
+                        "\$response = Invoke-WebRequest -Uri 'http://localhost:18081/health' -UseBasicParsing; ^
+                        Write-Host 'HTTP Status:' \$response.StatusCode; ^
+                        Write-Host 'Response:' \$response.Content; ^
+                        if (\$response.StatusCode -ne 200) { exit 1 }"
+                    """
+
+                    echo "New version health check PASSED"
+                }
+            }
+        }
+
     }
 }
