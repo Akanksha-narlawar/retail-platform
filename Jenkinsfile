@@ -79,6 +79,14 @@ pipeline {
                     ).trim()
 
                     echo "Selected Git commit: ${commitId}"
+
+                    echo "Checking out selected Git version: ${tag}"
+
+                    bat """
+                        git checkout --force ${tag}
+                    """
+
+                    echo "Git version ${tag} checked out successfully"
                 }
             }
         }
