@@ -32,5 +32,15 @@ def products():
         ]
     })
 
+@app.route("/product/<int:product_id>")
+def product_details(product_id):
+    return jsonify({
+        "product_id": product_id,
+        "name": "Laptop",
+        "price": 55000,
+        "category": "Electronics",
+        "availability": "In Stock"
+    })
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
