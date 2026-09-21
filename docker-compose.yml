@@ -1,0 +1,29 @@
+services:
+  retail-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    image: retail-app:4.2.0
+
+    container_name: retail-app-4.2.0
+
+    ports:
+      - "8081:5000"
+
+    environment:
+      APP_VERSION: "4.2.0"
+      ENVIRONMENT: "UAT"
+
+    networks:
+      - retail-network
+
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  retail-network:
+    driver: bridge
