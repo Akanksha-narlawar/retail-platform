@@ -200,14 +200,20 @@ pipeline {
                         "${dockerPath}" inspect --format="{{.State.Health.Status}}" retail-app-candidate
                     """
 
+                    echo "Waiting 15 seconds for application to become ready..."
+
+                    bat "timeout /t 15 /nobreak"
+
                     echo "Checking application health..."
 
                     bat """
-                        powershell -Command ^
-                        "\$response = Invoke-WebRequest -Uri 'http://localhost:18081/health' -UseBasicParsing; ^
-                        Write-Host 'HTTP Status:' \$response.StatusCode; ^
-                        Write-Host 'Response:' \$response.Content; ^
-                        if (\$response.StatusCode -ne 200) { exit 1 }"
+                        powershell -NoProfile -Command "try { \$response = Invoke-WebRequest -Uri 'http://localhost:18081/health' -UseBasicParsing; Write-Host ('HTTP Status: ' + \$response.StatusCode); Write-Host ('Response: ' + \$response.Content); if (\$response.StatusCode -ne 200) { exit 1 } } catch { Write-Host ('Health check failed: ' + \$_.Exception.Message); exit 1 }"
+                    """
+
+                    echo "Checking Docker health status..."
+
+                    bat """
+                        "${dockerPath}" inspect --format="{{.State.Health.Status}}" retail-app-candidate
                     """
 
                     echo "New version health check PASSED"
