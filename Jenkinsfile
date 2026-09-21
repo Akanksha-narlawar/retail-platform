@@ -31,15 +31,21 @@ pipeline {
 
         stage('Validate Parameters') {
             steps {
+                echo "======================================"
                 echo "Deployment Action: ${params.DEPLOYMENT_ACTION}"
                 echo "Environment: ${params.ENVIRONMENT}"
                 echo "Version: ${params.VERSION}"
                 echo "Production Confirmation: ${params.CONFIRM_PROD}"
+                echo "======================================"
 
                 script {
                     if (params.ENVIRONMENT == 'PRODUCTION' &&
                         params.CONFIRM_PROD != 'YES') {
-                        error("Production deployment blocked: CONFIRM_PROD must be YES")
+
+                        error(
+                            "Production deployment blocked: " +
+                            "CONFIRM_PROD must be YES"
+                        )
                     }
                 }
             }
@@ -49,6 +55,10 @@ pipeline {
             steps {
                 script {
                     def tag = "v${params.VERSION}"
+
+                    echo "Fetching Git tags..."
+
+                    bat "git fetch --tags --force"
 
                     echo "Checking Git tag: ${tag}"
 
@@ -72,5 +82,6 @@ pipeline {
                 }
             }
         }
+
     }
 }
